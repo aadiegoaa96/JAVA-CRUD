@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Empleados</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <h1>Lista de Empleados</h1>
+    <table id="empleadosTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Edad</th>
+                <th>ATC</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        fetch('/api/empleados')
+            .then(response => response.json())
+            .then(empleados => {
+                const tbody = document.querySelector('#empleadosTable tbody');
+                empleados.forEach(empleado => {
+                    const row = `<tr>
+                        <td>${empleado.id}</td>
+                        <td>${empleado.nombre}</td>
+                        <td>${empleado.apellido}</td>
+                        <td>${empleado.edad}</td>
+                        <td>${empleado.atc}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    </script>
+</body>
+</html>

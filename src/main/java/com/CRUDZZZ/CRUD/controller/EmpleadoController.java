@@ -51,8 +51,18 @@ public class EmpleadoController {
     }
 
     @GetMapping("/{id}")
-public Empleado obtenerEmpleadoPorId(@PathVariable Long id) {
-    return empleadoService.obtenerEmpleadoPorId(id);
-}
+    public Empleado obtenerEmpleadoPorId(@PathVariable Long id) {
+        return empleadoService.obtenerEmpleadoPorId(id);
+    }
+
+    @GetMapping("/buscar")
+    public List<Empleado> buscarEmpleados(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String apellido,
+            @RequestParam(required = false) Integer edad,
+            @RequestParam(required = false) String atc) {
+        return empleadoService.buscarEmpleados(nombre, apellido, edad, atc);
+    }
+    
 
 }

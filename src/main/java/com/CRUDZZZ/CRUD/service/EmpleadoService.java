@@ -54,4 +54,14 @@ public class EmpleadoService {
         return empleadoRepository.findById(id).orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
     }
     
+    public List<Empleado> buscarEmpleados(String nombre, String apellido, Integer edad, String atc) {
+        return empleadoRepository.findAll().stream()
+                .filter(empleado -> (nombre == null || empleado.getNombre().equalsIgnoreCase(nombre)) &&
+                                    (apellido == null || empleado.getApellido().equalsIgnoreCase(apellido)) &&
+                                    (edad == null || empleado.getEdad() == edad) &&
+                                    (atc == null || empleado.getAtc().equalsIgnoreCase(atc)))
+                .collect(Collectors.toList());
+    }
+    
+    
 }

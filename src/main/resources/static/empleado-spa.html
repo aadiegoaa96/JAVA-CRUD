@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>CRUD de Empleados - SPA</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
+
 <body>
     <h1>CRUD de Empleados</h1>
-    
+
     <!-- Formulario para crear o actualizar empleados -->
     <form id="empleadoForm">
         <h2 id="formTitle">Agregar Empleado</h2>
@@ -19,12 +21,32 @@
         <label for="edad">Edad:</label>
         <input type="number" id="edad" name="edad" required>
         <label for="atc">ATC:</label>
-        <select id="atc" name="atc">
+        <select id="atc" name="atc" required>
             <option value="Monterrey">Monterrey</option>
             <option value="Ciudad de Mexico">Ciudad de Mexico</option>
             <option value="Merida">Merida</option>
         </select>
         <button type="submit" id="submitButton">Agregar</button>
+    </form>
+
+    <!-- Barra de búsqueda -->
+    <h2>Buscar Empleados</h2>
+    <form id="searchForm">
+        <label for="searchNombre">Nombre:</label>
+        <input type="text" id="searchNombre" name="nombre">
+        <label for="searchApellido">Apellido:</label>
+        <input type="text" id="searchApellido" name="apellido">
+        <label for="searchEdad">Edad:</label>
+        <input type="number" id="searchEdad" name="edad">
+        <label for="searchAtc">ATC:</label>
+        <select id="searchAtc" name="atc">
+            <option value="">Todos</option>
+            <option value="Monterrey">Monterrey</option>
+            <option value="Ciudad de Mexico">Ciudad de Mexico</option>
+            <option value="Merida">Merida</option>
+        </select>
+        <button type="submit" id="searchButton">Buscar</button>
+        <button type="button" id="resetButton">Limpiar</button>
     </form>
 
     <!-- Tabla para mostrar la lista de empleados -->
@@ -49,7 +71,16 @@
         // Función para obtener todos los empleados
         async function getAllEmpleados() {
             const response = await fetch(apiUrl);
-            const empleados = await response.json();
+            if (response.ok) {
+                const empleados = await response.json();
+                mostrarEmpleados(empleados);
+            } else {
+                console.error("Error al obtener empleados");
+            }
+        }
+
+        // Función para mostrar empleados en la tabla
+        function mostrarEmpleados(empleados) {
             const tbody = document.querySelector('#empleadosTable tbody');
             tbody.innerHTML = '';
             empleados.forEach(empleado => {
@@ -69,13 +100,13 @@
         }
 
         // Función para crear o actualizar un empleado
-        document.getElementById('empleadoForm').addEventListener('submit', async function(event) {
+        document.getElementById('empleadoForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const id = document.getElementById('id').value;
             const empleado = {
                 nombre: document.getElementById('nombre').value,
                 apellido: document.getElementById('apellido').value,
-                edad: document.getElementById('edad').value,
+                edad: parseInt(document.getElementById('edad').value),
                 atc: document.getElementById('atc').value
             };
 
@@ -93,6 +124,8 @@
                 document.getElementById('empleadoForm').reset();
                 document.getElementById('submitButton').textContent = 'Agregar';
                 getAllEmpleados();
+            } else {
+                alert("Error al guardar el empleado");
             }
         });
 
@@ -115,12 +148,56 @@
                 if (response.ok) {
                     alert('Empleado eliminado');
                     getAllEmpleados();
+                } else {
+                    alert("Error al eliminar el empleado");
                 }
             }
         }
+
+        // Función para buscar empleados
+        document.getElementById('searchForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const nombre = document.getElementById('searchNombre').value.trim();
+            const apellido = document.getElementById('searchApellido').value.trim();
+            const edad = document.getElementById('searchEdad').value;
+            const atc = document.getElementById('searchAtc').value;
+
+            let queryParams = new URLSearchParams();
+
+            // Solo agregamos los parámetros si tienen valor
+            if (nombre) {
+                queryParams.append('nombre', nombre);
+            }
+            if (apellido) {
+                queryParams.append('apellido', apellido);
+            }
+            if (edad) {
+                queryParams.append('edad', edad);
+            }
+            if (atc) {
+                queryParams.append('atc', atc);
+            }
+
+            const response = await fetch(`${apiUrl}/buscar?${queryParams.toString()}`);
+            if (response.ok) {
+                const empleados = await response.json();
+                mostrarEmpleados(empleados);
+            } else {
+                alert("Error al buscar empleados");
+            }
+        });
+
+
+        // Función para limpiar el formulario de búsqueda
+        document.getElementById('resetButton').addEventListener('click', function () {
+            document.getElementById('searchForm').reset();
+            getAllEmpleados();
+        });
 
         // Cargar lista de empleados al cargar la página
         document.addEventListener('DOMContentLoaded', getAllEmpleados);
     </script>
 </body>
+
 </html>
